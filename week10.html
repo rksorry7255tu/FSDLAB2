@@ -1,130 +1,224 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="cssEventApp">
+<html lang="en" ng-app="jobRegApp">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AngularJS Form with CSS and Events</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job Registration - AngularJS</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <style>
       body {
         font-family: Arial, sans-serif;
-        text-align: center;
+        background: #f7f7f7;
+        padding: 20px;
       }
       .container {
-        width: 50%;
+        max-width: 400px;
         margin: auto;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        box-shadow: 2px 2px 10px #aaa;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       }
-      .highlight {
-        border: 2px solid green;
-        background-color: #eaffea;
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
       }
-      .error {
-        color: red;
-        font-size: 12px;
+      label {
+        font-weight: bold;
+        margin-top: 15px;
+        display: block;
       }
       input,
       select {
         width: 100%;
         padding: 8px;
-        margin: 5px 0;
-        border: 1px solid #ddd;
+        margin-top: 5px;
+        box-sizing: border-box;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      input.ng-invalid.ng-touched {
+        border-color: red;
+      }
+      .error {
+        color: red;
+        font-size: 12px;
+        margin-top: 3px;
       }
       button {
-        padding: 10px;
-        background: green;
-        color: white;
+        margin-top: 25px;
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 4px;
         border: none;
+        background: #28a745;
+        color: white;
         cursor: pointer;
       }
-      .hover-effect {
-        background-color: yellow;
-        cursor: pointer;
+      button:disabled {
+        background: #7ac98a;
+        cursor: not-allowed;
+      }
+      .success-message {
+        margin-top: 20px;
+        padding: 12px;
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        border-radius: 4px;
+        text-align: center;
       }
     </style>
   </head>
-  <body ng-controller="FormController">
-    <h2>AngularJS Form with CSS & Events</h2>
+  <body ng-controller="JobRegistrationController">
     <div class="container">
-      <form name="userForm" ng-submit="submitForm()">
-        <label>Full Name:</label>
+      <h2>Job Registration Form</h2>
+      <form name="jobForm" ng-submit="register(jobForm)" novalidate>
+        <label for="fullName">Full Name *</label>
         <input
           type="text"
+          id="fullName"
           name="fullName"
           ng-model="user.fullName"
           required
-          ng-class="{'highlight': isFocused}"
-          ng-focus="isFocused=true"
-          ng-blur="isFocused=false"
+          ng-trim="true"
         />
         <div
           class="error"
-          ng-show="userForm.fullName.$touched && userForm.fullName.$invalid"
+          ng-show="jobForm.fullName.$touched && jobForm.fullName.$error.required"
         >
-          Name is required.
+          Full Name is required.
         </div>
 
-        <label>Email:</label>
-        <input type="email" name="email" ng-model="user.email" required />
+        <label for="email">Email *</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          ng-model="user.email"
+          required
+        />
         <div
           class="error"
-          ng-show="userForm.email.$touched && userForm.email.$invalid"
+          ng-show="jobForm.email.$touched && jobForm.email.$error.required"
         >
-          Enter a valid email.
+          Email is required.
+        </div>
+        <div
+          class="error"
+          ng-show="jobForm.email.$touched && jobForm.email.$error.email"
+        >
+          Please enter a valid email.
         </div>
 
-        <label>Favorite Color:</label>
-        <select ng-model="user.color" ng-change="colorChanged()" required>
-          <option value="">Select a color</option>
-          <option value="red">Red</option>
-          <option value="blue">Blue</option>
-          <option value="green">Green</option>
-        </select>
-        <p>
-          Your selected color:
-          <span ng-style="{'color': user.color}">{{ user.color }}</span>
-        </p>
-
-        <br />
-        <button
-          type="submit"
-          ng-disabled="userForm.$invalid"
-          ng-mouseover="hover=true"
-          ng-mouseleave="hover=false"
-          ng-class="{'hover-effect': hover}"
+        <label for="password">Password *</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          ng-model="user.password"
+          required
+          minlength="6"
+        />
+        <div
+          class="error"
+          ng-show="jobForm.password.$touched && jobForm.password.$error.required"
         >
-          Submit
-        </button>
-      </form>
+          Password is required.
+        </div>
+        <div
+          class="error"
+          ng-show="jobForm.password.$touched && jobForm.password.$error.minlength"
+        >
+          Password must be at least 6 characters.
+        </div>
 
-      <h3 style="color: green" ng-show="submitted">
-        Form Submitted Successfully!
-      </h3>
+        <label for="confirmPassword">Confirm Password *</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          ng-model="user.confirmPassword"
+          required
+          pw-check="user.password"
+        />
+        <div
+          class="error"
+          ng-show="jobForm.confirmPassword.$touched && jobForm.confirmPassword.$error.required"
+        >
+          Confirm Password is required.
+        </div>
+        <div
+          class="error"
+          ng-show="jobForm.confirmPassword.$error.pwmatch && jobForm.confirmPassword.$touched"
+        >
+          Passwords do not match.
+        </div>
+
+        <label for="jobRole">Job Role *</label>
+        <select id="jobRole" name="jobRole" ng-model="user.jobRole" required>
+          <option value="" disabled selected>Select job role</option>
+          <option value="Developer">Developer</option>
+          <option value="Designer">Designer</option>
+          <option value="Manager">Manager</option>
+          <option value="Tester">Tester</option>
+        </select>
+        <div
+          class="error"
+          ng-show="jobForm.jobRole.$touched && jobForm.jobRole.$error.required"
+        >
+          Please select a job role.
+        </div>
+
+        <button type="submit" ng-disabled="jobForm.$invalid">Register</button>
+
+        <div class="success-message" ng-if="registered">
+          Registration Successful!
+        </div>
+      </form>
     </div>
 
     <script>
-      var app = angular.module("cssEventApp", []);
+      angular
+        .module("jobRegApp", [])
+        // Custom directive to check password match
+        .directive("pwCheck", function () {
+          return {
+            require: "ngModel",
+            scope: {
+              otherModelValue: "=pwCheck",
+            },
+            link: function (scope, element, attrs, ctrl) {
+              ctrl.$validators.pwmatch = function (modelValue) {
+                return modelValue === scope.otherModelValue;
+              };
+              scope.$watch("otherModelValue", function () {
+                ctrl.$validate();
+              });
+            },
+          };
+        })
+        .controller("JobRegistrationController", [
+          "$scope",
+          function ($scope) {
+            $scope.user = {};
+            $scope.registered = false;
 
-      app.controller("FormController", function ($scope) {
-        $scope.user = {};
-        $scope.isFocused = false;
-        $scope.hover = false;
-        $scope.submitted = false;
-
-        $scope.colorChanged = function () {
-          console.log("Color changed to:", $scope.user.color);
-        };
-
-        $scope.submitForm = function () {
-          if ($scope.userForm.$valid) {
-            $scope.submitted = true;
-            console.log("Form Data:", $scope.user);
-          }
-        };
-      });
+            $scope.register = function (form) {
+              if (form.$valid) {
+                $scope.registered = true;
+                console.log("Registered user:", $scope.user);
+                // Optionally reset form here:
+                // $scope.user = {};
+                // form.$setPristine();
+                // form.$setUntouched();
+              } else {
+                $scope.registered = false;
+              }
+            };
+          },
+        ]);
     </script>
   </body>
 </html>
